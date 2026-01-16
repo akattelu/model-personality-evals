@@ -568,6 +568,8 @@ const storyGroups: StoryGroup[] = [
 						question={MOCK_QUESTIONS[0] ?? ""}
 						response={MOCK_RESPONSE_LONG}
 						scores={MOCK_SCORES}
+						height={20}
+						width={80}
 					/>
 				),
 			},
@@ -580,6 +582,8 @@ const storyGroups: StoryGroup[] = [
 						question={MOCK_QUESTIONS[1] ?? ""}
 						response={MOCK_RESPONSE_SHORT}
 						scores={null}
+						height={20}
+						width={80}
 					/>
 				),
 			},

@@ -15,6 +15,8 @@ interface ResponseViewerProps {
 	question: string;
 	response: string;
 	scores: TraitScores | null;
+	height?: number;
+	width?: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,14 +62,19 @@ export const ResponseViewer = ({
 	question,
 	response,
 	scores,
+	height,
+	width,
 }: ResponseViewerProps) => {
 	const { stdout } = useStdout();
 	const [scrollOffset, setScrollOffset] = useState(0);
 
-	const terminalHeight = stdout?.rows ?? 24;
-	const terminalWidth = stdout?.columns ?? 80;
+	const terminalHeight = height ?? stdout?.rows ?? 24;
+	const terminalWidth = width ?? stdout?.columns ?? 80;
 	const contentWidth = terminalWidth - 10;
-	const visibleHeight = terminalHeight - 18; // Account for header, question, scores, footer
+
+	// Estimate question height (rough)
+	const questionLines = Math.ceil(question.length / contentWidth) + 2;
+	const visibleHeight = terminalHeight - questionLines - 6; // Account for question, header, padding
 
 	// Parse markdown
 	const ast = useMemo(() => parseMarkdown(response || ""), [response]);
@@ -75,8 +82,12 @@ export const ResponseViewer = ({
 	// Simple line count estimation
 	const totalLines = useMemo(() => {
 		const lines = response.split("\n").length;
-		// Rough estimate accounting for word wrap
-		return Math.max(lines, Math.ceil(response.length / contentWidth));
+		// Rough estimate accounting for word wrap and block elements
+		// Adding some buffer for headings/code blocks
+		return Math.max(
+			lines,
+			Math.ceil((response.length * 1.2) / (contentWidth * 0.65)),
+		);
 	}, [response, contentWidth]);
 
 	const maxScroll = Math.max(0, totalLines - visibleHeight);
@@ -99,13 +110,14 @@ export const ResponseViewer = ({
 		maxScroll > 0 ? Math.round((scrollOffset / maxScroll) * 100) : 100;
 
 	return (
-		<Box flexDirection="column" flexGrow={1}>
+		<Box flexDirection="column" height={terminalHeight} width={terminalWidth}>
 			{/* Question header */}
 			<Box
 				borderStyle="single"
 				borderColor="gray"
 				paddingX={1}
 				marginBottom={1}
+				flexShrink={0}
 			>
 				<Text color="white" wrap="wrap">
 					{question}
@@ -113,7 +125,7 @@ export const ResponseViewer = ({
 			</Box>
 
 			{/* Main content area */}
-			<Box flexDirection="row" flexGrow={1}>
+			<Box flexDirection="row" flexGrow={1} overflow="hidden">
 				{/* Response panel */}
 				<Box
 					flexDirection="column"
@@ -122,24 +134,25 @@ export const ResponseViewer = ({
 					paddingX={2}
 					paddingY={1}
 					width="70%"
+					height="100%"
 				>
-					<Box justifyContent="space-between" marginBottom={1}>
+					<Box justifyContent="space-between" marginBottom={1} flexShrink={0}>
 						<Box>
 							<Text color="gray">Response from </Text>
 							<Badge color={modelColor}>{modelName}</Badge>
 						</Box>
-						{canScroll && (
-							<Text color="gray">[↑↓ PgUp/PgDn] {scrollPercent}%</Text>
-						)}
+						{canScroll && <Text color="gray">[↑↓] {scrollPercent}%</Text>}
 					</Box>
 
 					<Box
 						flexDirection="column"
 						flexGrow={1}
 						overflow="hidden"
-						width={contentWidth * 0.65}
+						width="100%"
 					>
-						<MarkdownRenderer ast={ast} />
+						<Box flexDirection="column" marginTop={-scrollOffset}>
+							<MarkdownRenderer ast={ast} />
+						</Box>
 					</Box>
 				</Box>
 
@@ -152,6 +165,7 @@ export const ResponseViewer = ({
 					paddingY={1}
 					width="30%"
 					marginLeft={1}
+					height="100%"
 				>
 					<Text bold color="magenta">
 						Trait Scores

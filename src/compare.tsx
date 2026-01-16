@@ -203,6 +203,8 @@ const CompareApp = () => {
 					question={round?.question ?? ""}
 					response={round?.response ?? ""}
 					scores={round?.scores ?? null}
+					height={contentHeight}
+					width={contentWidth}
 				/>
 				<Footer viewMode={viewMode} />
 			</Box>
