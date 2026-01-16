@@ -47,7 +47,10 @@ const sliceNode = (
 			return {
 				...paragraph,
 				children: [
-					{ type: "text", value: textNode.value.slice(charsToSkip) } as MdastText,
+					{
+						type: "text",
+						value: textNode.value.slice(charsToSkip),
+					} as MdastText,
 				],
 			};
 		}
@@ -147,9 +150,7 @@ export const ModelResponse = ({
 
 		// Add subsequent nodes until we fill the view (roughly)
 		// We add a buffer of nodes to ensure we cover the screen
-		let linesInView = firstNode
-			? (heights[startIndex] ?? 0) - skipLines
-			: 0;
+		let linesInView = firstNode ? (heights[startIndex] ?? 0) - skipLines : 0;
 		for (let i = startIndex + 1; i < ast.children.length; i++) {
 			const child = ast.children[i];
 			if (child) {
@@ -209,17 +210,10 @@ export const ModelResponse = ({
 					{isStreaming && <Text color="magenta"> ● streaming...</Text>}
 				</Box>
 				{canScroll && !isStreaming && (
-					<Text color="gray">
-						[↑↓ scroll] {scrollPercent}%
-					</Text>
+					<Text color="gray">[↑↓ scroll] {scrollPercent}%</Text>
 				)}
 			</Box>
-			<Box
-				flexDirection="column"
-				flexGrow={1}
-				marginTop={1}
-				overflow="hidden"
-			>
+			<Box flexDirection="column" flexGrow={1} marginTop={1} overflow="hidden">
 				<MarkdownRenderer ast={visibleAst} />
 			</Box>
 		</Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Box, Text } from "ink";
 import { Badge } from "@inkjs/ui";
 // import Table from "ink-table"; // Removed due to ESM/CJS issues
@@ -50,13 +50,15 @@ const ListItemComp = ({
 	return (
 		<Box flexDirection="row">
 			<Text color="green">{ordered ? `${(index || 0) + 1}. ` : "• "}</Text>
-			<Box flexDirection="column" gap={1}>{children}</Box>
+			<Box flexDirection="column" gap={1}>
+				{children}
+			</Box>
 		</Box>
 	);
 };
 
 // Simple Table implementation since ink-table has CJS/ESM issues
-const SimpleTable = ({ data }: { data: string[][] }) => {
+export const SimpleTable = ({ data }: { data: string[][] }) => {
 	if (data.length === 0) return null;
 
 	// Calculate column widths
@@ -67,20 +69,39 @@ const SimpleTable = ({ data }: { data: string[][] }) => {
 	if (!colWidths) return null;
 
 	return (
-		<Box flexDirection="column" borderStyle="single" borderColor="gray">
+		<Box
+			flexDirection="column"
+			borderStyle="round"
+			borderColor="gray"
+			paddingX={1}
+		>
 			{data.map((row, rowIndex) => (
-				<Box key={rowIndex} flexDirection="row">
-					{row.map((cell, colIdx) => (
-						<Box
-							key={colIdx}
-							width={(colWidths[colIdx] ?? 0) + 2}
-							paddingX={1}
-							borderStyle={rowIndex === 0 ? "single" : undefined} // Header separation? No, ink borders are tricky on boxes.
-                            // Let's just use text padding.
-						>
-							<Text bold={rowIndex === 0}>{cell}</Text>
+				<Box key={`row-${rowIndex}`} flexDirection="column">
+					<Box flexDirection="row">
+						{row.map((cell, colIdx) => (
+							<Box
+								key={`cell-${rowIndex}-${colIdx}`}
+								width={(colWidths[colIdx] ?? 0) + 2}
+								paddingX={1}
+							>
+								<Text
+									bold={rowIndex === 0}
+									color={rowIndex === 0 ? "cyan" : undefined}
+								>
+									{cell}
+								</Text>
+							</Box>
+						))}
+					</Box>
+					{rowIndex === 0 && (
+						<Box flexDirection="row">
+							{colWidths.map((w, i) => (
+								<Box key={`sep-${i}`} width={w + 2} paddingX={1}>
+									<Text color="gray">{"─".repeat(w)}</Text>
+								</Box>
+							))}
 						</Box>
-					))}
+					)}
 				</Box>
 			))}
 		</Box>
@@ -101,11 +122,11 @@ const extractText = (node: Content): string => {
 };
 
 const transformTableData = (node: MdastTable): string[][] => {
-    // Return rows as string arrays
-	const rows = node.children.map((row) => 
-        row.children.map((cell) => extractText(cell as Content))
-    );
-    return rows;
+	// Return rows as string arrays
+	const rows = node.children.map((row) =>
+		row.children.map((cell) => extractText(cell as Content)),
+	);
+	return rows;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -114,7 +135,7 @@ const transformTableData = (node: MdastTable): string[][] => {
 
 interface NodeRendererProps {
 	node: Content | Root;
-    parent?: Content | Root;
+	parent?: Content | Root;
 }
 
 const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
@@ -311,4 +332,3 @@ export const MarkdownRenderer = ({
 }) => {
 	return <NodeRenderer node={ast} />;
 };
-

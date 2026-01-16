@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { render, Box, Text, useInput } from "ink";
 import { QuestionDisplay } from "./components/QuestionDisplay.tsx";
 import { ModelResponse } from "./components/ModelResponse.tsx";
@@ -539,9 +540,7 @@ const Storybook = () => {
 				<Text bold color="cyan">
 					Component Storybook
 				</Text>
-				<Text color="gray">
-					↑↓ component | ←→ variant | Esc to exit
-				</Text>
+				<Text color="gray">↑↓ component | ←→ variant | Esc to exit</Text>
 			</Box>
 
 			{/* Component list with story dots */}
@@ -563,7 +562,13 @@ const Storybook = () => {
 									return (
 										<Text
 											key={story.name}
-											color={isSelected ? "yellow" : isSelectedGroup ? "cyan" : "gray"}
+											color={
+												isSelected
+													? "yellow"
+													: isSelectedGroup
+														? "cyan"
+														: "gray"
+											}
 											bold={isSelected}
 										>
 											{isSelected ? "●" : "○"}{" "}

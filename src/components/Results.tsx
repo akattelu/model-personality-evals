@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Text } from "ink";
+import { Badge } from "@inkjs/ui";
+import { SimpleTable } from "../lib/markdown/renderer.tsx";
 import {
 	PERSONALITY_TRAITS,
 	type TraitScores,
@@ -49,46 +51,6 @@ const calculateAverages = (rounds: CompletedRound[]): TraitScores | null => {
 	return averages;
 };
 
-const TraitBar = ({
-	trait,
-	score,
-}: {
-	trait: (typeof PERSONALITY_TRAITS)[number];
-	score: number;
-}) => {
-	// Create a visual bar from -2 to +2 (5 segments)
-	const segments = 21;
-	const center = Math.floor(segments / 2);
-	const position = Math.round(((score + 2) / 4) * (segments - 1));
-
-	const bar = Array(segments)
-		.fill("─")
-		.map((char, i) => {
-			if (i === center) return "┼";
-			if (i === position) return "●";
-			return char;
-		})
-		.join("");
-
-	const color = score < -0.5 ? "red" : score > 0.5 ? "green" : "yellow";
-
-	return (
-		<Box flexDirection="column" marginBottom={1}>
-			<Box>
-				<Text color="gray">{trait.lowLabel.padEnd(12)}</Text>
-				<Text color={color}>{bar}</Text>
-				<Text color="gray"> {trait.highLabel.padStart(12)}</Text>
-			</Box>
-			<Box justifyContent="center">
-				<Text bold color={color}>
-					{trait.name}: {score > 0 ? "+" : ""}
-					{score.toFixed(2)}
-				</Text>
-			</Box>
-		</Box>
-	);
-};
-
 const RadarChart = ({ scores }: { scores: TraitScores }) => {
 	// Simple ASCII radar visualization
 	const traits = PERSONALITY_TRAITS.map((t) => ({
@@ -98,23 +60,26 @@ const RadarChart = ({ scores }: { scores: TraitScores }) => {
 	}));
 
 	return (
-		<Box flexDirection="column" alignItems="center" marginY={1}>
-			<Text color="cyan">┌─────────────────────────────┐</Text>
-			{traits.map((trait, i) => {
+		<Box
+			flexDirection="column"
+			alignItems="center"
+			marginY={1}
+			borderStyle="round"
+			borderColor="cyan"
+			paddingX={2}
+		>
+			{traits.map((trait) => {
 				const barLength = Math.round(trait.normalized * 20);
 				const bar = "█".repeat(barLength) + "░".repeat(20 - barLength);
 				const color =
 					trait.score < -0.5 ? "red" : trait.score > 0.5 ? "green" : "yellow";
 				return (
 					<Box key={trait.id}>
-						<Text color="cyan">│ </Text>
 						<Text>{trait.name.slice(0, 3).toUpperCase().padEnd(4)}</Text>
 						<Text color={color}>{bar}</Text>
-						<Text color="cyan"> │</Text>
 					</Box>
 				);
 			})}
-			<Text color="cyan">└─────────────────────────────┘</Text>
 		</Box>
 	);
 };
@@ -135,66 +100,65 @@ export const Results = ({ completedRounds, modelName }: ResultsProps) => {
 		);
 	}
 
+	const tableData = [
+		["Trait", "Score", "Tendency"],
+		...PERSONALITY_TRAITS.map((trait) => {
+			const score = averages[trait.id];
+			const tendency =
+				score < -0.5
+					? trait.lowLabel
+					: score > 0.5
+						? trait.highLabel
+						: "Neutral";
+			return [trait.name, score.toFixed(2), tendency];
+		}),
+	];
+
 	return (
 		<Box flexDirection="column" padding={1}>
 			{/* Header */}
 			<Box
 				flexDirection="column"
 				alignItems="center"
-				borderStyle="double"
-				borderColor="magenta"
-				paddingX={3}
 				paddingY={1}
 				marginBottom={1}
 			>
-				<Text color="magenta" bold>
-					╔═══════════════════════════════════════╗
-				</Text>
-				<Text color="magenta" bold>
-					║ PERSONALITY ANALYSIS COMPLETE ║
-				</Text>
-				<Text color="magenta" bold>
-					╚═══════════════════════════════════════╝
-				</Text>
-				<Box marginTop={1}>
-					<Text color="gray">Model: </Text>
-					<Text color="cyan" bold>
-						{modelName}
+				<Badge color="magenta">PERSONALITY ANALYSIS COMPLETE</Badge>
+
+				<Box marginTop={1} gap={2}>
+					<Box>
+						<Text color="gray">Model: </Text>
+						<Badge color="cyan">{modelName}</Badge>
+					</Box>
+					<Box>
+						<Text color="gray">Rounds: </Text>
+						<Badge color="white">{completedRounds.length}</Badge>
+					</Box>
+				</Box>
+			</Box>
+
+			<Box flexDirection="row" justifyContent="space-around">
+				{/* Radar Chart Area */}
+				<Box flexDirection="column" alignItems="center">
+					<Text bold color="cyan" underline>
+						Trait Overview
 					</Text>
+					<RadarChart scores={averages} />
 				</Box>
-				<Box>
-					<Text color="gray">Questions Analyzed: </Text>
-					<Text color="white">{completedRounds.length}</Text>
+
+				{/* Detailed Table Area */}
+				<Box flexDirection="column" alignItems="center">
+					<Text bold color="white" underline>
+						Detailed Metrics
+					</Text>
+					<Box marginTop={1}>
+						<SimpleTable data={tableData} />
+					</Box>
 				</Box>
-			</Box>
-
-			{/* Radar Chart */}
-			<Box flexDirection="column" alignItems="center" marginBottom={1}>
-				<Text bold color="cyan">
-					Trait Overview
-				</Text>
-				<RadarChart scores={averages} />
-			</Box>
-
-			{/* Detailed Trait Bars */}
-			<Box
-				flexDirection="column"
-				borderStyle="single"
-				borderColor="gray"
-				paddingX={2}
-				paddingY={1}
-			>
-				<Text bold color="white" underline>
-					Detailed Trait Analysis
-				</Text>
-				<Box marginTop={1} />
-				{PERSONALITY_TRAITS.map((trait) => (
-					<TraitBar key={trait.id} trait={trait} score={averages[trait.id]} />
-				))}
 			</Box>
 
 			{/* Footer */}
-			<Box marginTop={1} justifyContent="center">
+			<Box marginTop={2} justifyContent="center">
 				<Text color="gray">Press Ctrl+C to exit</Text>
 			</Box>
 		</Box>

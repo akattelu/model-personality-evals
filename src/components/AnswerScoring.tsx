@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text } from "ink";
+import { Badge } from "@inkjs/ui";
 import { OpenRouter } from "@openrouter/sdk";
 
 // Personality traits to evaluate (-2 to 2 scale)
@@ -175,7 +176,7 @@ export const AnswerScoring = ({
 		>
 			<Box marginBottom={1}>
 				<Text color="gray">Evaluator: </Text>
-				<Text color="yellow">{evaluatorModel}</Text>
+				<Badge color="yellow">{evaluatorModel}</Badge>
 				{isEvaluating && <Text color="magenta"> ● evaluating...</Text>}
 			</Box>
 
