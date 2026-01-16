@@ -20,6 +20,8 @@ interface ModelResponseProps {
 	modelName: string;
 	response: string;
 	isStreaming: boolean;
+	height?: number;
+	width?: number;
 }
 
 // Helper to slice a node from the top
@@ -95,16 +97,19 @@ export const ModelResponse = ({
 	modelName,
 	response,
 	isStreaming,
+	height,
+	width,
 }: ModelResponseProps) => {
 	const { stdout } = useStdout();
 	const [scrollOffset, setScrollOffset] = useState(0);
 
-	// Calculate dimensions
-	// Terminal height minus: question area (2) + padding (2) + border (2) + header (2) + some margin (3)
+	// Calculate dimensions - use props if provided, otherwise fall back to terminal dimensions
 	const terminalHeight = stdout?.rows ?? 24;
 	const terminalWidth = stdout?.columns ?? 80;
-	const contentWidth = terminalWidth - 8; // Account for borders and padding
-	const visibleHeight = terminalHeight - 11; // Available lines for content
+	const boxWidth = width ?? terminalWidth;
+	const boxHeight = height ?? terminalHeight - 11;
+	const contentWidth = boxWidth - 8; // Account for borders and padding
+	const visibleHeight = boxHeight - 4; // Account for border (2) + header (2)
 
 	// Parse AST
 	const ast = useMemo(() => parseMarkdown(response || ""), [response]);
@@ -196,12 +201,11 @@ export const ModelResponse = ({
 	return (
 		<Box
 			flexDirection="column"
-			flexGrow={1}
 			borderStyle="round"
 			borderColor="green"
 			paddingX={2}
-			marginTop={1}
-			height={visibleHeight + 2} // Force height to contain overflow roughly?
+			height="100%"
+			width={boxWidth}
 		>
 			<Box justifyContent="space-between" flexShrink={0}>
 				<Box>
@@ -213,7 +217,13 @@ export const ModelResponse = ({
 					<Text color="gray">[↑↓ scroll] {scrollPercent}%</Text>
 				)}
 			</Box>
-			<Box flexDirection="column" flexGrow={1} marginTop={1} overflow="hidden">
+			<Box
+				flexDirection="column"
+				flexGrow={1}
+				marginTop={1}
+				overflow="hidden"
+				width={contentWidth}
+			>
 				<MarkdownRenderer ast={visibleAst} />
 			</Box>
 		</Box>

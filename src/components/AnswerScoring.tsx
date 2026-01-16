@@ -45,6 +45,7 @@ interface AnswerScoringProps {
 	question: string;
 	answer: string;
 	onComplete?: (scores: TraitScores | null) => void;
+	width?: number;
 }
 
 const EVALUATOR_PROMPT = `You are an expert psychologist evaluating personality traits based on how someone responds to situational questions.
@@ -117,6 +118,7 @@ export const AnswerScoring = ({
 	question,
 	answer,
 	onComplete,
+	width,
 }: AnswerScoringProps) => {
 	const [scores, setScores] = useState<TraitScores | null>(null);
 	const [isEvaluating, setIsEvaluating] = useState(true);
@@ -172,7 +174,8 @@ export const AnswerScoring = ({
 			borderColor="magenta"
 			paddingX={2}
 			paddingY={1}
-			marginTop={1}
+			height="100%"
+			width={width}
 		>
 			<Box marginBottom={1}>
 				<Text color="gray">Evaluator: </Text>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { render, Box, useApp, useInput, useStdout, Text } from "ink";
+import { render, Box, useApp, useInput, Text } from "ink";
 import { OpenRouter } from "@openrouter/sdk";
 import { parseArgs } from "node:util";
 import { QuestionDisplay } from "./components/QuestionDisplay.tsx";
 import { ModelResponse } from "./components/ModelResponse.tsx";
+import { TwoColumnLayout } from "./components/TwoColumnLayout.tsx";
 import {
 	AnswerScoring,
 	type TraitScores,
@@ -15,9 +16,6 @@ import {
 } from "./components/Results.tsx";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
-
-const enterAltScreen = "\x1b[?1049h";
-const leaveAltScreen = "\x1b[?1049l";
 
 const DEFAULT_MODEL = "openai/gpt-oss-120b:free";
 
@@ -55,12 +53,9 @@ const App = () => {
 	const [isStreaming, setIsStreaming] = useState(true);
 	const [isScoring, setIsScoring] = useState(false);
 	const [completedRounds, setCompletedRounds] = useState<CompletedRound[]>([]);
-	const [scrollOffset, setScrollOffset] = useState(0);
 	const hasSaved = React.useRef(false);
 	const { exit } = useApp();
-	const { stdout } = useStdout();
 
-	const terminalHeight = stdout?.rows ?? 24;
 	const isComplete = currentQuestionIndex >= QUESTIONS.length;
 
 	// Save results when complete
@@ -104,12 +99,6 @@ const App = () => {
 	useInput((input, key) => {
 		if (key.ctrl && input === "c") {
 			exit();
-		}
-		// Scroll through feed
-		if (key.upArrow) {
-			setScrollOffset((prev) => Math.max(0, prev - 1));
-		} else if (key.downArrow) {
-			setScrollOffset((prev) => prev + 1);
 		}
 	});
 
@@ -181,52 +170,52 @@ const App = () => {
 				{isComplete && <Text color="green"> ✓ Complete</Text>}
 			</Box>
 
-			{/* Completed rounds feed */}
-			{completedRounds.map((round) => (
-				<Box
-					key={round.questionIndex}
-					flexDirection="column"
-					marginBottom={1}
-					borderStyle="single"
-					borderColor="gray"
-					paddingX={1}
-				>
-					<Text color="gray" dimColor>
-						Q{round.questionIndex + 1}: {round.question.slice(0, 60)}...
-					</Text>
-					<Text color="gray" dimColor>
-						Response: {round.response.slice(0, 100).replace(/\n/g, " ")}...
-					</Text>
-					{round.scores && (
-						<Text color="gray" dimColor>
-							Scores: A:{round.scores.assertiveness} E:{round.scores.empathy} O:
-							{round.scores.openness} D:{round.scores.directness} P:
-							{round.scores.optimism}
-						</Text>
-					)}
-				</Box>
-			))}
-
-			{/* Current question */}
+			{/* Current question with two-column layout */}
 			{!isComplete && currentQuestion && (
 				<>
 					<QuestionDisplay
 						question={currentQuestion}
 						questionNumber={currentQuestionIndex + 1}
 					/>
-					<ModelResponse
-						modelName={EVALUATED_MODEL}
-						response={currentResponse}
-						isStreaming={isStreaming}
+					<TwoColumnLayout
+						left={(dims) => (
+							<ModelResponse
+								modelName={EVALUATED_MODEL}
+								response={currentResponse}
+								isStreaming={isStreaming}
+								width={dims.width}
+								height={dims.height}
+							/>
+						)}
+						right={(dims) =>
+							isScoring && currentResponse ? (
+								<AnswerScoring
+									evaluatorModel={EVALUATOR_MODEL}
+									question={currentQuestion}
+									answer={currentResponse}
+									onComplete={handleScoringComplete}
+									width={dims.width}
+								/>
+							) : (
+								<Box
+									borderStyle="round"
+									borderColor="gray"
+									height="100%"
+									width={dims.width}
+									flexDirection="column"
+									paddingX={2}
+									paddingY={1}
+								>
+									<Text color="gray">Evaluator</Text>
+									<Box marginTop={1}>
+										<Text color="gray" dimColor>
+											Waiting for response to complete...
+										</Text>
+									</Box>
+								</Box>
+							)
+						}
 					/>
-					{isScoring && currentResponse && (
-						<AnswerScoring
-							evaluatorModel={EVALUATOR_MODEL}
-							question={currentQuestion}
-							answer={currentResponse}
-							onComplete={handleScoringComplete}
-						/>
-					)}
 				</>
 			)}
 
@@ -241,11 +230,6 @@ const App = () => {
 	);
 };
 
-// Enter alternate screen buffer
-process.stdout.write(enterAltScreen);
-
 const instance = render(<App />, { patchConsole: false, exitOnCtrlC: false });
 
-void instance.waitUntilExit().then(() => {
-	process.stdout.write(leaveAltScreen);
-});
+void instance.waitUntilExit();

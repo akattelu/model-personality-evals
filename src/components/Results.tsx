@@ -117,7 +117,7 @@ export const Results = ({ completedRounds, modelName }: ResultsProps) => {
 	];
 
 	return (
-		<Box flexDirection="column" padding={1}>
+		<Box flexDirection="column" padding={1} width="100%">
 			{/* Header */}
 			<Box
 				flexDirection="column"
