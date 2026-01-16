@@ -152,6 +152,53 @@ If the behavior continues, I might need to:
 
 The key is maintaining professionalism while standing up for myself.`;
 
+const MOCK_MD_FORMATTING = `
+# Heading 1
+## Heading 2
+### Heading 3
+
+**Bold text** and *italic text* and ~~strikethrough~~.
+Inline \`code\` snippet.
+[Link](https://example.com)
+`;
+
+const MOCK_MD_CODE = `
+Here is some code:
+
+\`\`\`typescript
+const hello = "world";
+console.log(hello);
+\`\`\`
+
+And python:
+\`\`\`python
+def hello():
+    print("world")
+\`\`\`
+`;
+
+const MOCK_MD_LISTS = `
+- Item 1
+- Item 2
+  - Nested item
+- Item 3
+
+1. First
+2. Second
+3. Third
+
+> This is a blockquote.
+> It can span multiple lines.
+`;
+
+const MOCK_MD_TABLE = `
+| Feature | Status | Notes |
+| :--- | :---: | ---: |
+| Markdown | ✅ | Supported |
+| Tables | ✅ | Works |
+| Streaming | ⚠️ | In progress |
+`;
+
 const MOCK_COMPLETED_ROUNDS = [
 	{
 		questionIndex: 0,
@@ -249,6 +296,46 @@ const storyGroups: StoryGroup[] = [
 					<ModelResponse
 						modelName="meta-llama/llama-3-70b"
 						response={MOCK_RESPONSE_LONG}
+						isStreaming={false}
+					/>
+				),
+			},
+			{
+				name: "Formatting",
+				component: (
+					<ModelResponse
+						modelName="markdown-test"
+						response={MOCK_MD_FORMATTING}
+						isStreaming={false}
+					/>
+				),
+			},
+			{
+				name: "Code Blocks",
+				component: (
+					<ModelResponse
+						modelName="coder-bot"
+						response={MOCK_MD_CODE}
+						isStreaming={false}
+					/>
+				),
+			},
+			{
+				name: "Lists & Quotes",
+				component: (
+					<ModelResponse
+						modelName="writer-bot"
+						response={MOCK_MD_LISTS}
+						isStreaming={false}
+					/>
+				),
+			},
+			{
+				name: "Tables",
+				component: (
+					<ModelResponse
+						modelName="data-bot"
+						response={MOCK_MD_TABLE}
 						isStreaming={false}
 					/>
 				),
