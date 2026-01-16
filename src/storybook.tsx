@@ -439,48 +439,6 @@ const storyGroups: StoryGroup[] = [
 			},
 		],
 	},
-	{
-		componentName: "Combined",
-		stories: [
-			{
-				name: "Question + Response",
-				component: (
-					<Box flexDirection="column">
-						<QuestionDisplay
-							question="You're working on a team project and a colleague takes credit for your idea in a meeting. How do you handle this situation?"
-							questionNumber={1}
-						/>
-						<ModelResponse
-							modelName="anthropic/claude-3-opus"
-							response={MOCK_RESPONSE_SHORT}
-							isStreaming={false}
-						/>
-					</Box>
-				),
-			},
-			{
-				name: "Full Eval Flow",
-				component: (
-					<Box flexDirection="column">
-						<QuestionDisplay
-							question="You're working on a team project and a colleague takes credit for your idea in a meeting. How do you handle this situation?"
-							questionNumber={1}
-						/>
-						<ModelResponse
-							modelName="anthropic/claude-3-opus"
-							response={MOCK_RESPONSE_SHORT}
-							isStreaming={false}
-						/>
-						<StaticAnswerScoring
-							evaluatorModel="openai/gpt-4"
-							scores={MOCK_SCORES}
-							isEvaluating={false}
-						/>
-					</Box>
-				),
-			},
-		],
-	},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
