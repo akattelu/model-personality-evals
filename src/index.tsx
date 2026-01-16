@@ -3,11 +3,13 @@ import { render, Box, useApp, useInput } from 'ink';
 import { OpenRouter } from '@openrouter/sdk';
 import { QuestionDisplay } from './components/QuestionDisplay.tsx';
 import { ModelResponse } from './components/ModelResponse.tsx';
+import { AnswerScoring } from './components/AnswerScoring.tsx';
 
 const enterAltScreen = '\x1b[?1049h';
 const leaveAltScreen = '\x1b[?1049l';
 
-const EVALUATED_MODEL = 'google/gemini-2.0-flash-001';
+const EVALUATED_MODEL = 'openai/gpt-oss-120b:free';
+const EVALUATOR_MODEL = 'openai/gpt-oss-120b:free';
 
 const SAMPLE_QUESTION = "You're working on a team project and a colleague takes credit for your idea in a meeting. How do you handle this situation?";
 
@@ -56,6 +58,13 @@ const App = () => {
         response={response}
         isStreaming={isStreaming}
       />
+      {!isStreaming && response && (
+        <AnswerScoring
+          evaluatorModel={EVALUATOR_MODEL}
+          question={SAMPLE_QUESTION}
+          answer={response}
+        />
+      )}
     </Box>
   );
 };
