@@ -4,14 +4,39 @@ import { OpenRouter } from "@openrouter/sdk";
 
 // Personality traits to evaluate (-2 to 2 scale)
 export const PERSONALITY_TRAITS = [
-	{ id: "assertiveness", name: "Assertiveness", lowLabel: "Passive", highLabel: "Assertive" },
-	{ id: "empathy", name: "Empathy", lowLabel: "Detached", highLabel: "Empathetic" },
-	{ id: "openness", name: "Openness", lowLabel: "Conventional", highLabel: "Creative" },
-	{ id: "directness", name: "Directness", lowLabel: "Diplomatic", highLabel: "Blunt" },
-	{ id: "optimism", name: "Optimism", lowLabel: "Pessimistic", highLabel: "Optimistic" },
+	{
+		id: "assertiveness",
+		name: "Assertiveness",
+		lowLabel: "Passive",
+		highLabel: "Assertive",
+	},
+	{
+		id: "empathy",
+		name: "Empathy",
+		lowLabel: "Detached",
+		highLabel: "Empathetic",
+	},
+	{
+		id: "openness",
+		name: "Openness",
+		lowLabel: "Conventional",
+		highLabel: "Creative",
+	},
+	{
+		id: "directness",
+		name: "Directness",
+		lowLabel: "Diplomatic",
+		highLabel: "Blunt",
+	},
+	{
+		id: "optimism",
+		name: "Optimism",
+		lowLabel: "Pessimistic",
+		highLabel: "Optimistic",
+	},
 ] as const;
 
-export type TraitId = typeof PERSONALITY_TRAITS[number]["id"];
+export type TraitId = (typeof PERSONALITY_TRAITS)[number]["id"];
 export type TraitScores = Record<TraitId, number>;
 
 interface AnswerScoringProps {
@@ -58,7 +83,11 @@ const parseScores = (response: string): TraitScores | null => {
 	}
 };
 
-const ScoreBar = ({ score, lowLabel, highLabel }: { score: number; lowLabel: string; highLabel: string }) => {
+const ScoreBar = ({
+	score,
+	lowLabel,
+	highLabel,
+}: { score: number; lowLabel: string; highLabel: string }) => {
 	// Convert -2 to 2 scale to 0 to 4 for display
 	const normalized = score + 2; // 0 to 4
 	const filled = "█".repeat(normalized + 1);
@@ -72,7 +101,11 @@ const ScoreBar = ({ score, lowLabel, highLabel }: { score: number; lowLabel: str
 			<Text color={color}>{filled}</Text>
 			<Text color="gray">{empty}</Text>
 			<Text color="gray"> {highLabel}</Text>
-			<Text color="cyan"> ({score > 0 ? "+" : ""}{score})</Text>
+			<Text color="cyan">
+				{" "}
+				({score > 0 ? "+" : ""}
+				{score})
+			</Text>
 		</Box>
 	);
 };
@@ -92,9 +125,10 @@ export const AnswerScoring = ({
 				apiKey: process.env.OPENROUTER_API_KEY,
 			});
 
-			const prompt = EVALUATOR_PROMPT
-				.replace("{QUESTION}", question)
-				.replace("{ANSWER}", answer);
+			const prompt = EVALUATOR_PROMPT.replace("{QUESTION}", question).replace(
+				"{ANSWER}",
+				answer,
+			);
 
 			try {
 				const result = openrouter.callModel({
@@ -111,7 +145,9 @@ export const AnswerScoring = ({
 					setError("Failed to parse evaluator response");
 				}
 			} catch (err) {
-				setError(`Evaluation error: ${err instanceof Error ? err.message : String(err)}`);
+				setError(
+					`Evaluation error: ${err instanceof Error ? err.message : String(err)}`,
+				);
 			} finally {
 				setIsEvaluating(false);
 			}

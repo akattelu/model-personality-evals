@@ -12,19 +12,19 @@ const renderMarkdown = (text: string): string => {
 	return (
 		text
 			// Headers: ### Header -> just the text
-			.replace(/^#{1,6}\s+/gm, '')
+			.replace(/^#{1,6}\s+/gm, "")
 			// Bullet points: - item or * item -> • item
-			.replace(/^(\s*)[-*]\s+/gm, '$1• ')
+			.replace(/^(\s*)[-*]\s+/gm, "$1• ")
 			// Numbered lists: 1. item -> 1) item (cleaner look)
-			.replace(/^(\s*)(\d+)\.\s+/gm, '$1$2) ')
+			.replace(/^(\s*)(\d+)\.\s+/gm, "$1$2) ")
 			// Remove bold markers
-			.replace(/\*\*(.+?)\*\*/g, '$1')
+			.replace(/\*\*(.+?)\*\*/g, "$1")
 			// Remove italic markers
-			.replace(/\*(.+?)\*/g, '$1')
+			.replace(/\*(.+?)\*/g, "$1")
 			// Remove inline code backticks
-			.replace(/`([^`]+)`/g, '$1')
+			.replace(/`([^`]+)`/g, "$1")
 			// Collapse multiple blank lines into one
-			.replace(/\n{3,}/g, '\n\n')
+			.replace(/\n{3,}/g, "\n\n")
 			.trim()
 	);
 };
@@ -33,9 +33,9 @@ const renderMarkdown = (text: string): string => {
 const wrapText = (text: string, width: number): string[] => {
 	const lines: string[] = [];
 
-	for (const line of text.split('\n')) {
+	for (const line of text.split("\n")) {
 		if (line.length === 0) {
-			lines.push('');
+			lines.push("");
 			continue;
 		}
 
@@ -47,7 +47,7 @@ const wrapText = (text: string, width: number): string[] => {
 			}
 
 			// Find last space within width
-			let breakPoint = remaining.lastIndexOf(' ', width);
+			let breakPoint = remaining.lastIndexOf(" ", width);
 			if (breakPoint === -1 || breakPoint === 0) {
 				breakPoint = width;
 			}
@@ -77,8 +77,8 @@ export const ModelResponse = ({
 
 	// Render markdown and wrap to fit width
 	const wrappedLines = useMemo(
-		() => wrapText(renderMarkdown(response || ''), contentWidth),
-		[response, contentWidth]
+		() => wrapText(renderMarkdown(response || ""), contentWidth),
+		[response, contentWidth],
 	);
 
 	const totalLines = wrappedLines.length;
@@ -95,13 +95,13 @@ export const ModelResponse = ({
 	useInput((input, key) => {
 		if (!isStreaming) {
 			if (key.upArrow) {
-				setScrollOffset(prev => Math.max(0, prev - 1));
+				setScrollOffset((prev) => Math.max(0, prev - 1));
 			} else if (key.downArrow) {
-				setScrollOffset(prev => Math.min(maxScroll, prev + 1));
+				setScrollOffset((prev) => Math.min(maxScroll, prev + 1));
 			} else if (key.pageUp) {
-				setScrollOffset(prev => Math.max(0, prev - visibleHeight));
+				setScrollOffset((prev) => Math.max(0, prev - visibleHeight));
 			} else if (key.pageDown) {
-				setScrollOffset(prev => Math.min(maxScroll, prev + visibleHeight));
+				setScrollOffset((prev) => Math.min(maxScroll, prev + visibleHeight));
 			}
 		}
 	});
@@ -109,18 +109,17 @@ export const ModelResponse = ({
 	// Get visible lines
 	const visibleLines = wrappedLines.slice(
 		scrollOffset,
-		scrollOffset + visibleHeight
+		scrollOffset + visibleHeight,
 	);
 
 	// Pad with empty lines if content doesn't fill the box
 	while (visibleLines.length < visibleHeight) {
-		visibleLines.push('');
+		visibleLines.push("");
 	}
 
 	const canScroll = totalLines > visibleHeight;
-	const scrollPercent = maxScroll > 0
-		? Math.round((scrollOffset / maxScroll) * 100)
-		: 100;
+	const scrollPercent =
+		maxScroll > 0 ? Math.round((scrollOffset / maxScroll) * 100) : 100;
 
 	return (
 		<Box
@@ -138,14 +137,12 @@ export const ModelResponse = ({
 					{isStreaming && <Text color="magenta"> ● streaming...</Text>}
 				</Box>
 				{canScroll && !isStreaming && (
-					<Text color="gray">
-						[↑↓ scroll] {scrollPercent}%
-					</Text>
+					<Text color="gray">[↑↓ scroll] {scrollPercent}%</Text>
 				)}
 			</Box>
 			<Box flexDirection="column" flexGrow={1} marginTop={1}>
-				{visibleLines.map((line, i) => (
-					<Text key={`${scrollOffset}-${i}`}>{line}</Text>
+				{visibleLines.map((line) => (
+					<Text key={`${scrollOffset}-${line}`}>{line}</Text>
 				))}
 			</Box>
 		</Box>

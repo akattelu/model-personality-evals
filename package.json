@@ -4,7 +4,8 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "bun run src/index.tsx"
+		"start": "bun run src/index.tsx",
+		"lint:fix": "biome format --fix . && biome lint --fix ."
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
