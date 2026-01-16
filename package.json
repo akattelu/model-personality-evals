@@ -1,0 +1,21 @@
+{
+	"name": "model-personality",
+	"module": "src/index.tsx",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "bun run src/index.tsx"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/react": "^19.2.8"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@openrouter/sdk": "^0.3.14",
+		"ink": "^6.6.0",
+		"react": "^19.2.3"
+	}
+}
