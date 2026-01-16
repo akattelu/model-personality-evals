@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { render, Box, useApp, useInput, useStdout, Text } from "ink";
 import { OpenRouter } from "@openrouter/sdk";
-import { parseArgs } from "util";
+import { parseArgs } from "node:util";
 import { QuestionDisplay } from "./components/QuestionDisplay.tsx";
 import { ModelResponse } from "./components/ModelResponse.tsx";
 import {
 	AnswerScoring,
 	type TraitScores,
 } from "./components/AnswerScoring.tsx";
+import { Results } from "./components/Results.tsx";
 
 const enterAltScreen = "\x1b[?1049h";
 const leaveAltScreen = "\x1b[?1049l";
@@ -191,23 +192,12 @@ const App = () => {
 				</>
 			)}
 
-			{/* Completion message */}
+			{/* Results summary */}
 			{isComplete && (
-				<Box
-					flexDirection="column"
-					borderStyle="double"
-					borderColor="green"
-					padding={1}
-					marginTop={1}
-				>
-					<Text bold color="green">
-						Evaluation Complete!
-					</Text>
-					<Text>
-						Evaluated {QUESTIONS.length} questions with model {EVALUATED_MODEL}
-					</Text>
-					<Text color="gray">Press Ctrl+C to exit</Text>
-				</Box>
+				<Results
+					completedRounds={completedRounds}
+					modelName={EVALUATED_MODEL}
+				/>
 			)}
 		</Box>
 	);
