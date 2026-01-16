@@ -133,4 +133,11 @@ Ink documentation can be found at https://github.com/vadimdemedes/ink/blob/maste
 # Commands
 
 * `bun run start`: starts the evals TUI
+* `bun run storybook`: preview Ink components without running inference
 * `bun run lint:fix`: runs and autofixes linter and formatter issues
+
+## Storybook
+
+`src/storybook.tsx` provides a lightweight component preview tool for Ink components. Use ↑↓ to switch components, ←→ to switch variants.
+
+To add stories: find the `storyGroups` array and add entries to existing groups or create new ones. Each story needs a `name` and `component` (JSX).
