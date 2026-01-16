@@ -8,7 +8,7 @@ import {
 	type TraitId,
 } from "./AnswerScoring.tsx";
 
-interface CompletedRound {
+export interface CompletedRound {
 	questionIndex: number;
 	question: string;
 	response: string;
@@ -20,7 +20,9 @@ interface ResultsProps {
 	modelName: string;
 }
 
-const calculateAverages = (rounds: CompletedRound[]): TraitScores | null => {
+export const calculateAverages = (
+	rounds: CompletedRound[],
+): TraitScores | null => {
 	const roundsWithScores = rounds.filter((r) => r.scores !== null);
 	if (roundsWithScores.length === 0) return null;
 
