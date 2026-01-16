@@ -75,35 +75,51 @@ export const SimpleTable = ({ data }: { data: string[][] }) => {
 			borderColor="gray"
 			paddingX={1}
 		>
-			{data.map((row, rowIndex) => (
-				<Box key={`row-${rowIndex}`} flexDirection="column">
-					<Box flexDirection="row">
-						{row.map((cell, colIdx) => (
-							<Box
-								key={`cell-${rowIndex}-${colIdx}`}
-								width={(colWidths[colIdx] ?? 0) + 2}
-								paddingX={1}
-							>
-								<Text
-									bold={rowIndex === 0}
-									color={rowIndex === 0 ? "cyan" : undefined}
-								>
-									{cell}
-								</Text>
-							</Box>
-						))}
-					</Box>
-					{rowIndex === 0 && (
+			{data.map((row, rowIndex) => {
+				return (
+					<Box
+						// biome-ignore lint/suspicious/noArrayIndexKey: stable
+						key={`row-${rowIndex}`}
+						flexDirection="column"
+					>
 						<Box flexDirection="row">
-							{colWidths.map((w, i) => (
-								<Box key={`sep-${i}`} width={w + 2} paddingX={1}>
-									<Text color="gray">{"─".repeat(w)}</Text>
-								</Box>
-							))}
+							{row.map((cell, colIdx) => {
+								return (
+									<Box
+										// biome-ignore lint/suspicious/noArrayIndexKey: stable
+										key={`cell-${rowIndex}-${colIdx}`}
+										width={(colWidths[colIdx] ?? 0) + 2}
+										paddingX={1}
+									>
+										<Text
+											bold={rowIndex === 0}
+											color={rowIndex === 0 ? "cyan" : undefined}
+										>
+											{cell}
+										</Text>
+									</Box>
+								);
+							})}
 						</Box>
-					)}
-				</Box>
-			))}
+						{rowIndex === 0 && (
+							<Box flexDirection="row">
+								{colWidths.map((w, i) => {
+									return (
+										<Box
+											// biome-ignore lint/suspicious/noArrayIndexKey: stable
+											key={`sep-${i}`}
+											width={w + 2}
+											paddingX={1}
+										>
+											<Text color="gray">{"─".repeat(w)}</Text>
+										</Box>
+									);
+								})}
+							</Box>
+						)}
+					</Box>
+				);
+			})}
 		</Box>
 	);
 };
@@ -146,7 +162,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Box flexDirection="column">
 					{(node as Root).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Box>
 			);
@@ -158,7 +179,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 				<Box marginBottom={isInsideListOrQuote ? 0 : 1}>
 					<Text>
 						{(node as Parent).children.map((child, i) => (
-							<NodeRenderer key={i} node={child} parent={node} />
+							<NodeRenderer
+								// biome-ignore lint/suspicious/noArrayIndexKey: stable
+								key={i}
+								node={child}
+								parent={node}
+							/>
 						))}
 					</Text>
 				</Box>
@@ -181,7 +207,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 				<Box marginTop={1} marginBottom={1}>
 					<Text bold color={color} underline={depth <= 2}>
 						{(node as Parent).children.map((child, i) => (
-							<NodeRenderer key={i} node={child} parent={node} />
+							<NodeRenderer
+								// biome-ignore lint/suspicious/noArrayIndexKey: stable
+								key={i}
+								node={child}
+								parent={node}
+							/>
 						))}
 					</Text>
 				</Box>
@@ -192,7 +223,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Text italic>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Text>
 			);
@@ -201,7 +237,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Text bold>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Text>
 			);
@@ -210,7 +251,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Text strikethrough>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Text>
 			);
@@ -243,7 +289,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Blockquote>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Blockquote>
 			);
@@ -256,12 +307,18 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 					<Component>
 						{listNode.children.map((child, i) => (
 							<ListItemComp
+								// biome-ignore lint/suspicious/noArrayIndexKey: stable
 								key={i}
 								index={i}
 								ordered={listNode.ordered || false}
 							>
 								{(child as ListItem).children.map((subChild, j) => (
-									<NodeRenderer key={j} node={subChild} parent={child} />
+									<NodeRenderer
+										// biome-ignore lint/suspicious/noArrayIndexKey: stable
+										key={j}
+										node={subChild}
+										parent={child}
+									/>
 								))}
 							</ListItemComp>
 						))}
@@ -275,7 +332,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Box>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Box>
 			);
@@ -284,7 +346,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 			return (
 				<Text color="blue" underline>
 					{(node as Parent).children.map((child, i) => (
-						<NodeRenderer key={i} node={child} parent={node} />
+						<NodeRenderer
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={i}
+							node={child}
+							parent={node}
+						/>
 					))}
 				</Text>
 			);
@@ -315,7 +382,12 @@ const NodeRenderer: React.FC<NodeRendererProps> = ({ node, parent }) => {
 				return (
 					<>
 						{(node as Parent).children.map((child, i) => (
-							<NodeRenderer key={i} node={child} parent={node} />
+							<NodeRenderer
+								// biome-ignore lint/suspicious/noArrayIndexKey: stable
+								key={i}
+								node={child}
+								parent={node}
+							/>
 						))}
 					</>
 				);

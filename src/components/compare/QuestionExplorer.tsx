@@ -64,7 +64,10 @@ export const QuestionExplorer = ({
 				{questions.slice(0, 5).map((question, idx) => {
 					const isSelected = idx === selectedQuestionIndex;
 					return (
-						<Box key={idx}>
+						<Box
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
+							key={idx}
+						>
 							<Text color={isSelected ? "yellow" : "gray"}>
 								{isSelected ? "▸" : " "}Q{idx + 1}:{" "}
 							</Text>
@@ -102,6 +105,7 @@ export const QuestionExplorer = ({
 					const isSelected = idx === selectedQuestionIndex;
 					return (
 						<Text
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable
 							key={idx}
 							color={isSelected ? "yellow" : "gray"}
 							bold={isSelected}
@@ -147,7 +151,9 @@ export const QuestionExplorer = ({
 							<Box key={model.name}>
 								<Text color={model.color} bold={isActive}>
 									{isActive ? "▸" : " "}
-									{model.displayName.slice(0, modelNameLen).padEnd(modelNameLen + 1)}
+									{model.displayName
+										.slice(0, modelNameLen)
+										.padEnd(modelNameLen + 1)}
 								</Text>
 								{PERSONALITY_TRAITS.map((trait) => {
 									const score = scores?.[trait.id as TraitId];

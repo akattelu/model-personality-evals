@@ -613,13 +613,19 @@ const storyGroups: StoryGroup[] = [
 			{
 				name: "Question 1",
 				component: (
-					<ScoreDistributionPanel model={MOCK_MODELS[0]!} questionIndex={0} />
+					<ScoreDistributionPanel
+						model={MOCK_MODELS[0] as ModelData}
+						questionIndex={0}
+					/>
 				),
 			},
 			{
 				name: "Question 3",
 				component: (
-					<ScoreDistributionPanel model={MOCK_MODELS[1]!} questionIndex={2} />
+					<ScoreDistributionPanel
+						model={MOCK_MODELS[1] as ModelData}
+						questionIndex={2}
+					/>
 				),
 			},
 		],

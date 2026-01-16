@@ -128,7 +128,8 @@ const drawModelProfile = (
 	const traitIds = PERSONALITY_TRAITS.map((t) => t.id);
 
 	for (let i = 0; i < traitIds.length; i++) {
-		const traitId = traitIds[i]!;
+		const traitId = traitIds[i];
+		if (!traitId) continue;
 		const score = model.aggregateScores[traitId];
 		const normalized = normalizeScore(score);
 		const radius = 1 + normalized * (maxRadius - 1);
@@ -144,18 +145,26 @@ const drawModelProfile = (
 	};
 
 	for (let i = 0; i < points.length; i++) {
-		const p1 = points[i]!;
-		const p2 = points[(i + 1) % points.length]!;
+		const p1 = points[i];
+		const p2 = points[(i + 1) % points.length];
+		if (!p1 || !p2) continue;
 		drawLine(grid, p1.x, p1.y, p2.x, p2.y, lineCell, width, height);
 	}
 
 	const markerChar = isActive ? "●" : "○";
-	for (const point of points) {
+	for (let i = 0; i < points.length; i++) {
+		const point = points[i];
+		if (!point) continue;
 		setCell(
 			grid,
 			point.x,
 			point.y,
-			{ char: markerChar, color: model.color, bold: isActive, dimColor: !isActive },
+			{
+				char: markerChar,
+				color: model.color,
+				bold: isActive,
+				dimColor: !isActive,
+			},
 			width,
 			height,
 		);
@@ -178,9 +187,19 @@ const drawBasePentagon = (
 	}
 
 	for (let i = 0; i < points.length; i++) {
-		const p1 = points[i]!;
-		const p2 = points[(i + 1) % points.length]!;
-		drawLine(grid, p1.x, p1.y, p2.x, p2.y, { char: "·", color: "gray" }, width, height);
+		const p1 = points[i];
+		const p2 = points[(i + 1) % points.length];
+		if (!p1 || !p2) continue;
+		drawLine(
+			grid,
+			p1.x,
+			p1.y,
+			p2.x,
+			p2.y,
+			{ char: "·", color: "gray" },
+			width,
+			height,
+		);
 	}
 
 	setCell(grid, centerX, centerY, { char: "+", color: "gray" }, width, height);
@@ -223,14 +242,32 @@ export const RadarChart = ({
 		if (i !== activeModelIndex) {
 			const model = models[i];
 			if (model) {
-				drawModelProfile(grid, model, false, maxRadius, centerX, centerY, chartWidth, chartHeight);
+				drawModelProfile(
+					grid,
+					model,
+					false,
+					maxRadius,
+					centerX,
+					centerY,
+					chartWidth,
+					chartHeight,
+				);
 			}
 		}
 	}
 
 	const activeModel = models[activeModelIndex];
 	if (activeModel) {
-		drawModelProfile(grid, activeModel, true, maxRadius, centerX, centerY, chartWidth, chartHeight);
+		drawModelProfile(
+			grid,
+			activeModel,
+			true,
+			maxRadius,
+			centerX,
+			centerY,
+			chartWidth,
+			chartHeight,
+		);
 	}
 
 	// Calculate label positions
@@ -238,7 +275,8 @@ export const RadarChart = ({
 	const traitIds = PERSONALITY_TRAITS.map((t) => t.id);
 
 	for (let i = 0; i < traitIds.length; i++) {
-		const traitId = traitIds[i]!;
+		const traitId = traitIds[i];
+		if (!traitId) continue;
 		const pos = getVertexPosition(i, maxRadius + 2, centerX, centerY);
 		traitLabels.push({ label: TRAIT_ABBREV[traitId], x: pos.x, y: pos.y });
 	}
@@ -253,7 +291,9 @@ export const RadarChart = ({
 			const cell = row[x];
 			if (!cell) continue;
 
-			const label = traitLabels.find((l) => Math.abs(l.x - x) <= 1 && l.y === y);
+			const label = traitLabels.find(
+				(l) => Math.abs(l.x - x) <= 1 && l.y === y,
+			);
 
 			if (label && x === Math.max(0, label.x - 1)) {
 				result.push(
@@ -266,7 +306,12 @@ export const RadarChart = ({
 			}
 
 			result.push(
-				<Text key={`cell-${y}-${x}`} color={cell.color} bold={cell.bold} dimColor={cell.dimColor}>
+				<Text
+					key={`cell-${y}-${x}`}
+					color={cell.color}
+					bold={cell.bold}
+					dimColor={cell.dimColor}
+				>
 					{cell.char}
 				</Text>,
 			);
@@ -290,6 +335,7 @@ export const RadarChart = ({
 			</Text>
 			<Box flexDirection="column" overflow="hidden">
 				{grid.map((row, y) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: grid rows are stable and have no unique ID
 					<Box key={`row-${y}`}>
 						<Text>{renderRow(row, y)}</Text>
 					</Box>
