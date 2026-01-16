@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { render, Box, useApp, useInput, useStdout, Text } from "ink";
 import { OpenRouter } from "@openrouter/sdk";
+import { parseArgs } from "util";
 import { QuestionDisplay } from "./components/QuestionDisplay.tsx";
 import { ModelResponse } from "./components/ModelResponse.tsx";
 import {
@@ -11,8 +12,27 @@ import {
 const enterAltScreen = "\x1b[?1049h";
 const leaveAltScreen = "\x1b[?1049l";
 
-const EVALUATED_MODEL = "openai/gpt-oss-120b:free";
-const EVALUATOR_MODEL = "openai/gpt-oss-120b:free";
+const DEFAULT_MODEL = "openai/gpt-oss-120b:free";
+
+// Parse CLI arguments
+const { values } = parseArgs({
+	args: Bun.argv,
+	options: {
+		model: {
+			type: "string",
+			short: "m",
+		},
+		evaluator: {
+			type: "string",
+			short: "e",
+		},
+	},
+	strict: true,
+	allowPositionals: true,
+});
+
+const EVALUATED_MODEL = values.model ?? DEFAULT_MODEL;
+const EVALUATOR_MODEL = values.evaluator ?? DEFAULT_MODEL;
 
 const QUESTIONS = [
 	"You're working on a team project and a colleague takes credit for your idea in a meeting. How do you handle this situation?",
