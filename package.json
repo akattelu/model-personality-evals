@@ -5,6 +5,7 @@
 	"private": true,
 	"scripts": {
 		"start": "bun run src/index.tsx",
+		"compare": "bun run src/compare.tsx",
 		"storybook": "bun run src/storybook.tsx",
 		"lint:fix": "biome format --fix . && biome lint --fix ."
 	},

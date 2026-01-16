@@ -8,6 +8,13 @@ import {
 	PERSONALITY_TRAITS,
 	type TraitScores,
 } from "./components/AnswerScoring.tsx";
+import { RadarChart } from "./components/compare/RadarChart.tsx";
+import { QuestionExplorer } from "./components/compare/QuestionExplorer.tsx";
+import { ResponseViewer } from "./components/compare/ResponseViewer.tsx";
+import { TraitExtremesPanel } from "./components/compare/TraitExtremesPanel.tsx";
+import { ScoreDistributionPanel } from "./components/compare/ScoreDistributionPanel.tsx";
+import { ModelLegend } from "./components/compare/ModelLegend.tsx";
+import type { ModelData, ModelColor } from "./compare.tsx";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Static version of AnswerScoring for storybook (no API calls)
@@ -238,6 +245,73 @@ const MOCK_COMPLETED_ROUNDS = [
 	},
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Mock Model Data for Compare Components
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOCK_QUESTIONS = [
+	"You're working on a team project and a colleague takes credit for your idea. How do you handle this?",
+	"You discover an error in a report your manager already submitted. What do you do?",
+	"A close friend asks to borrow money but you're unsure they can repay. How do you respond?",
+	"You're offered a promotion requiring relocation, but family is settled. How do you decide?",
+	"You witness a coworker being treated unfairly. Speaking up could jeopardize your position. What do you do?",
+];
+
+const createMockModelData = (
+	name: string,
+	color: ModelColor,
+	scores: TraitScores,
+): ModelData => ({
+	name,
+	displayName: name.split("/").pop() || name,
+	color,
+	aggregateScores: scores,
+	questions: MOCK_QUESTIONS,
+	rounds: MOCK_QUESTIONS.map((question, idx) => ({
+		questionIndex: idx,
+		question,
+		response: MOCK_RESPONSE_LONG,
+		scores: {
+			assertiveness: scores.assertiveness + (Math.random() - 0.5),
+			empathy: scores.empathy + (Math.random() - 0.5),
+			openness: scores.openness + (Math.random() - 0.5),
+			directness: scores.directness + (Math.random() - 0.5),
+			optimism: scores.optimism + (Math.random() - 0.5),
+		},
+	})),
+});
+
+const MOCK_MODELS: ModelData[] = [
+	createMockModelData("openai/gpt-4", "cyan", {
+		assertiveness: 1.4,
+		empathy: 1.8,
+		openness: 0.8,
+		directness: 0.4,
+		optimism: 1.8,
+	}),
+	createMockModelData("anthropic/claude-3", "magenta", {
+		assertiveness: 0.5,
+		empathy: 2.0,
+		openness: 1.5,
+		directness: -0.5,
+		optimism: 1.2,
+	}),
+	createMockModelData("meta/llama-3-70b", "yellow", {
+		assertiveness: 1.8,
+		empathy: 0.3,
+		openness: 0.2,
+		directness: 1.5,
+		optimism: 0.5,
+	}),
+	createMockModelData("google/gemma-3", "green", {
+		assertiveness: -0.5,
+		empathy: 1.2,
+		openness: 1.8,
+		directness: -1.0,
+		optimism: 1.5,
+	}),
+];
+
 const storyGroups: StoryGroup[] = [
 	{
 		componentName: "QuestionDisplay",
@@ -435,6 +509,117 @@ const storyGroups: StoryGroup[] = [
 						]}
 						modelName="openai/gpt-4"
 					/>
+				),
+			},
+		],
+	},
+	{
+		componentName: "RadarChart",
+		stories: [
+			{
+				name: "4 Models",
+				component: <RadarChart models={MOCK_MODELS} activeModelIndex={0} />,
+			},
+			{
+				name: "Claude Active",
+				component: <RadarChart models={MOCK_MODELS} activeModelIndex={1} />,
+			},
+			{
+				name: "Llama Active",
+				component: <RadarChart models={MOCK_MODELS} activeModelIndex={2} />,
+			},
+		],
+	},
+	{
+		componentName: "QuestionExplorer",
+		stories: [
+			{
+				name: "Compact",
+				component: (
+					<QuestionExplorer
+						models={MOCK_MODELS}
+						activeModelIndex={0}
+						selectedQuestionIndex={0}
+						compact
+					/>
+				),
+			},
+			{
+				name: "Full View",
+				component: (
+					<QuestionExplorer
+						models={MOCK_MODELS}
+						activeModelIndex={0}
+						selectedQuestionIndex={2}
+					/>
+				),
+			},
+		],
+	},
+	{
+		componentName: "ResponseViewer",
+		stories: [
+			{
+				name: "With Scores",
+				component: (
+					<ResponseViewer
+						modelName="gpt-4"
+						modelColor="cyan"
+						question={MOCK_QUESTIONS[0] ?? ""}
+						response={MOCK_RESPONSE_LONG}
+						scores={MOCK_SCORES}
+					/>
+				),
+			},
+			{
+				name: "No Scores",
+				component: (
+					<ResponseViewer
+						modelName="claude-3"
+						modelColor="magenta"
+						question={MOCK_QUESTIONS[1] ?? ""}
+						response={MOCK_RESPONSE_SHORT}
+						scores={null}
+					/>
+				),
+			},
+		],
+	},
+	{
+		componentName: "ModelLegend",
+		stories: [
+			{
+				name: "First Active",
+				component: <ModelLegend models={MOCK_MODELS} activeModelIndex={0} />,
+			},
+			{
+				name: "Last Active",
+				component: <ModelLegend models={MOCK_MODELS} activeModelIndex={3} />,
+			},
+		],
+	},
+	{
+		componentName: "TraitExtremes",
+		stories: [
+			{
+				name: "4 Models",
+				component: <TraitExtremesPanel models={MOCK_MODELS} />,
+			},
+		],
+	},
+	{
+		componentName: "ScoreDistribution",
+		stories: [
+			{
+				name: "Question 1",
+				component: (
+					<ScoreDistributionPanel model={MOCK_MODELS[0]!} questionIndex={0} />
+				),
+			},
+			{
+				name: "Question 3",
+				component: (
+					<ScoreDistributionPanel model={MOCK_MODELS[1]!} questionIndex={2} />
 				),
 			},
 		],

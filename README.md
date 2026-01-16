@@ -1,28 +1,26 @@
 # model-personality
 
+Run evals and view comparisons for AI model personality tests in the terminal.
+
+
+## Usage
+
 To install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+Note: Running evals requires an `$OPENROUTER_API_KEY` present
 
-```bash
-bun run index.ts
-```
+```sh
+# Run the evals app
+bun run start --model google/gemini-2.0-flash-001 --evaluator anthropic/claude-3.5-sonnet`
 
-This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
-
-Example:
-`bun src/index.tsx --model google/gemini-2.0-flash-001 --evaluator anthropic/claude-3.5-sonnet`
-
-## Storybook
-
-Preview UI components without running inference:
-
-```bash
+# Run component previews with fake data
 bun run storybook
-```
 
-Navigate with ↑↓ (components) and ←→ (variants).
+# Run the comparison app
+# This uses json result files stored in results/ after successful runs
+bun run compare
+```
