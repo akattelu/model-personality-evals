@@ -1,12 +1,11 @@
 # Model Personality Evals
 
-This repo will hold a set of AI evals that operates like a personality test. This will allow us to compare different models and see how their personalities differ.
-The repo has been initialized with the `bun init` and no other code has been written. Keep this documentation up-to-date after all changes.
+This repo holds an application to run AI evals that operates like a personality test. This will allow us to compare different models and see how their personalities differ.
 
-Proposed stack:
-- Use typescript with bun (more info on how to use bun below)
-- Use the OpenRouter SDK, because it already has capabilities to multiplex between different models to test
-
+Stack:
+- Typescript with Bun
+- OpenRouter SDK
+- React/Ink for terminal rendering
 
 ## Evaluation Flow
 This flow requires a set of questions and 2 models: an evaluated model and an evaluator model.
@@ -129,3 +128,9 @@ For more information, read the Bun API docs in `node_modules/bun-types/docs/**.m
 # Ink
 
 Ink documentation can be found at https://github.com/vadimdemedes/ink/blob/master/readme.md or using context7
+
+
+# Commands
+
+* `bun run start`: starts the evals TUI
+* `bun run lint:fix`: runs and autofixes linter and formatter issues

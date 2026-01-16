@@ -43,6 +43,7 @@ interface AnswerScoringProps {
 	evaluatorModel: string;
 	question: string;
 	answer: string;
+	onComplete?: (scores: TraitScores | null) => void;
 }
 
 const EVALUATOR_PROMPT = `You are an expert psychologist evaluating personality traits based on how someone responds to situational questions.
@@ -114,6 +115,7 @@ export const AnswerScoring = ({
 	evaluatorModel,
 	question,
 	answer,
+	onComplete,
 }: AnswerScoringProps) => {
 	const [scores, setScores] = useState<TraitScores | null>(null);
 	const [isEvaluating, setIsEvaluating] = useState(true);
@@ -130,6 +132,8 @@ export const AnswerScoring = ({
 				answer,
 			);
 
+			let parsedScores: TraitScores | null = null;
+
 			try {
 				const result = openrouter.callModel({
 					model: evaluatorModel,
@@ -137,10 +141,10 @@ export const AnswerScoring = ({
 				});
 
 				const response = await result.getText();
-				const parsed = parseScores(response);
+				parsedScores = parseScores(response);
 
-				if (parsed) {
-					setScores(parsed);
+				if (parsedScores) {
+					setScores(parsedScores);
 				} else {
 					setError("Failed to parse evaluator response");
 				}
@@ -150,11 +154,15 @@ export const AnswerScoring = ({
 				);
 			} finally {
 				setIsEvaluating(false);
+				// Brief delay so user can see scores before moving to next question
+				setTimeout(() => {
+					onComplete?.(parsedScores);
+				}, 2000);
 			}
 		};
 
 		evaluate();
-	}, [evaluatorModel, question, answer]);
+	}, [evaluatorModel, question, answer, onComplete]);
 
 	return (
 		<Box

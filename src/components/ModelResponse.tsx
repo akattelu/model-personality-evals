@@ -141,8 +141,8 @@ export const ModelResponse = ({
 				)}
 			</Box>
 			<Box flexDirection="column" flexGrow={1} marginTop={1}>
-				{visibleLines.map((line) => (
-					<Text key={`${scrollOffset}-${line}`}>{line}</Text>
+				{visibleLines.map((line, idx) => (
+					<Text key={`line-${scrollOffset + idx}`}>{line}</Text>
 				))}
 			</Box>
 		</Box>
